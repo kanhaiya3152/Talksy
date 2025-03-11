@@ -1,10 +1,17 @@
 import 'package:chat_app/firebase_options.dart';
+import 'package:chat_app/screens/chat_screen.dart';
+import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
+import 'package:chat_app/screens/profile_screen.dart';
+import 'package:chat_app/screens/splash.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   // await Firebase.initializeApp();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -21,10 +28,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chat App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: Color.fromRGBO(0, 0, 0, 1)),
-      home:LoginScreen(),
+      theme: ThemeData.dark()
+          .copyWith(scaffoldBackgroundColor: Color.fromRGBO(0, 0, 0, 1)),
+      home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return SplashScreen();
+            }
+            if (snapshot.hasData) {
+              return ChatScreen();
+            }
+
+            return LoginScreen();
+          }),
+      // home: ProfileScreen(),
     );
   }
 }
-

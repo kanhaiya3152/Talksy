@@ -1,4 +1,5 @@
 import 'package:chat_app/model/users.dart';
+import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<SignupScreen> {
 
       String userId = userCredential.user!.uid;
 
-      Users user = Users(uid: userId, username: username, email: email);
+      Users user = Users(uid: userId, username: username, email: email,profilePic: "");
 
       await FirebaseFirestore.instance
           .collection("users")
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<SignupScreen> {
         ));
 
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (ctx) => HomeScreen()),
+          MaterialPageRoute(builder: (ctx) => ChatScreen()),
         );
       }
     } on FirebaseAuthException catch (e) {
