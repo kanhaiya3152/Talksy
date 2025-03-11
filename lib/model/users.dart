@@ -4,11 +4,12 @@ class Users {
   final String uid;
   final String username;
   final String email;
-
+  final String profilePic;
   Users({
     required this.uid,
     required this.username,
     required this.email,
+    required this.profilePic
   });
 
   static Users fromSnap(DocumentSnapshot snap) {
@@ -22,6 +23,7 @@ class Users {
       uid: snapshot['uid'] ?? '',
       username: snapshot['username'] ?? '',
       email: snapshot['email'] ?? '',
+      profilePic: snapshot['profilePic'] ?? '',
     );
   }
 
@@ -29,5 +31,6 @@ class Users {
         "uid": uid,
         "username": username,
         "email": email,
+        "profilePic" : profilePic,
       };
 }
