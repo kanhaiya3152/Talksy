@@ -4,6 +4,7 @@ import 'package:chat_app/screens/profile_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -14,6 +15,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final userId = FirebaseAuth.instance.currentUser!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,8 +48,9 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection("users")
-            .where('uid', isNotEqualTo: userId.uid)
+            .collection("chatrooms")
+            .where("participants", arrayContains: userId.uid)
+            .orderBy("lastMessage.createdAt", descending: true)
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,7 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No users found"));
+            return Center(child: Text("No conversations found"));
           }
 
           return Padding(
@@ -75,64 +78,113 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.black,
                     ),
                     itemBuilder: (context, index) {
-                      var userDoc = snapshot.data!.docs[index];
-                      var userName = userDoc['username'];
-                      var userProfilePic = userDoc['profilePic'];
-                      var userUid = userDoc['uid'];
+                      var chatRoomDoc = snapshot.data!.docs[index];
+                      var chatRoomData =
+                          chatRoomDoc.data() as Map<String, dynamic>;
 
-                      return ListTile(
-                        tileColor: const Color.fromARGB(255, 31, 30, 30),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5)),
-                        leading: userProfilePic != null
-                            ? CircleAvatar(
-                                radius: 25,
-                                backgroundImage: NetworkImage(userProfilePic),
-                              )
-                            : CircleAvatar(
-                                radius: 25,
-                                backgroundColor: Colors.grey,
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.black,
+                      // 🔥 Get receiver details
+                      var participants =
+                          chatRoomData["participants"] as List<dynamic>;
+                      var receiverId =
+                          participants.firstWhere((id) => id != userId.uid);
+                      var lastMessage =
+                          chatRoomData["lastMessage"] as Map<String, dynamic>?;
+                      var unreadCounter = chatRoomData["unreadCounter"] != null
+                          ? (chatRoomData["unreadCounter"][userId.uid] ?? 0)
+                          : 0;
+
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection("users")
+                            .doc(receiverId)
+                            .get(),
+                        builder: (context, userSnapshot) {
+                          if (userSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return SizedBox(); // Avoid showing empty data
+                          }
+
+                          if (!userSnapshot.hasData ||
+                              !userSnapshot.data!.exists) {
+                            return SizedBox();
+                          }
+
+                          var userDoc = userSnapshot.data!;
+                          var userName = userDoc["username"];
+                          var userProfilePic = userDoc["profilePic"];
+
+                          return ListTile(
+                            tileColor: const Color.fromARGB(255, 31, 30, 30),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)),
+                            leading: userProfilePic != null
+                                ? CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage:
+                                        NetworkImage(userProfilePic),
+                                  )
+                                : CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.grey,
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                            title: Text(userName ?? 'No Name'),
+                            subtitle: Text(
+                              lastMessage != null
+                                  ? lastMessage["text"]
+                                  : "No messages yet",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  lastMessage == null
+                                      ? ""
+                                      : getTime(lastMessage["createdAt"]),
+                                  style: const TextStyle(color: Colors.grey),
                                 ),
-                              ),
-                        title: Text(userName ?? 'No Name'),
-                        subtitle: Text(
-                          "data",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        trailing: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text("15 min ago"),
-                            SizedBox(
-                              height: 10,
+                                SizedBox(height: 10),
+                                unreadCounter == 0
+                                    ? SizedBox(height: 10)
+                                    : CircleAvatar(
+                                        radius: 10,
+                                        backgroundColor: Colors.black,
+                                        child: Text(
+                                          "$unreadCounter",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10),
+                                        ),
+                                      ),
+                              ],
                             ),
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: Colors.black,
-                              child: Text(
-                                "1",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 10),
-                              ),
-                            )
-                          ],
-                        ),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (ctx) => ChatDetailScreen(
-                                receiverId: userUid,
-                                receiverName: userName,
-                                receiverProfilePic: userProfilePic,
-                              ),
-                            ),
+                            onTap: () {
+                              // 🔥 Reset unreadCounter when opening chat
+                              FirebaseFirestore.instance
+                                  .collection("chatrooms")
+                                  .doc(chatRoomDoc.id)
+                                  .update({
+                                "unreadCounter.${userId.uid}": 0,
+                              });
+
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => ChatDetailScreen(
+                                    receiverId: receiverId,
+                                    receiverName: userName,
+                                    receiverProfilePic: userProfilePic,
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
                       );
@@ -145,5 +197,10 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       ),
     );
+  }
+
+  String getTime(Timestamp timestamp) {
+    final dateTime = timestamp.toDate();
+    return DateFormat('hh:mm a').format(dateTime);
   }
 }
