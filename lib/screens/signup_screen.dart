@@ -2,6 +2,7 @@ import 'package:chat_app/model/users.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
+import 'package:chat_app/widgets/bottom_navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -11,10 +12,10 @@ class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<SignupScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   String username = "";
   String email = "";
   String password = "";
@@ -49,7 +50,8 @@ class _LoginScreenState extends State<SignupScreen> {
 
       String userId = userCredential.user!.uid;
 
-      Users user = Users(uid: userId, username: username, email: email,profilePic: "");
+      Users user =
+          Users(uid: userId, username: username, email: email, profilePic: "",);
 
       await FirebaseFirestore.instance
           .collection("users")
@@ -67,7 +69,7 @@ class _LoginScreenState extends State<SignupScreen> {
         ));
 
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (ctx) => ChatScreen()),
+          MaterialPageRoute(builder: (ctx) => BottomNavigation()),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -82,11 +84,17 @@ class _LoginScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      // backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(left: 20, right: 20, top: 150),
+          margin: EdgeInsets.only(
+            left: screenWidth * 0.05,
+            right: screenWidth * 0.05,
+            top: screenHeight * 0.12,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -95,13 +103,13 @@ class _LoginScreenState extends State<SignupScreen> {
                 child: Container(
                   child: Image.asset(
                     "assets/text.png",
-                    height: 140,
-                    width: 200,
+                    height: screenHeight * 0.2,
+                    width: screenWidth * 0.5,
                   ),
                 ),
               ),
               SizedBox(
-                height: 50,
+                height: screenHeight * 0.05,
               ),
               TextFormField(
                 controller: _usernameController,
@@ -114,19 +122,23 @@ class _LoginScreenState extends State<SignupScreen> {
                 keyboardType: TextInputType.text,
                 obscureText: false,
                 decoration: InputDecoration(
-                    hintText: "Enter your name",
-                    prefixIcon: Icon(Icons.person),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context)),
-                    filled: true,
-                    contentPadding: const EdgeInsets.all(8),
-                    border: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context))),
+                  hintText: "Enter your name",
+                  prefixIcon: Icon(Icons.person),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                  filled: true,
+                  contentPadding: const EdgeInsets.all(8),
+                  border: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                ),
               ),
               SizedBox(
-                height: 20,
+                height: screenHeight * 0.02,
               ),
               TextFormField(
                 controller: _emailController,
@@ -138,21 +150,23 @@ class _LoginScreenState extends State<SignupScreen> {
                 },
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                    hintText: "Enter your email",
-                    // fillColor: Colors.black54,
-                    prefixIcon: Icon(Icons.email_outlined),
-                    // hintStyle: TextStyle(color: Colors.white),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context)),
-                    filled: true,
-                    contentPadding: const EdgeInsets.all(8),
-                    border: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context))),
+                  hintText: "Enter your email",
+                  prefixIcon: Icon(Icons.email_outlined),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                  filled: true,
+                  contentPadding: const EdgeInsets.all(8),
+                  border: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                ),
               ),
               SizedBox(
-                height: 20,
+                height: screenHeight * 0.02,
               ),
               TextFormField(
                 controller: _passwordController,
@@ -165,19 +179,23 @@ class _LoginScreenState extends State<SignupScreen> {
                 keyboardType: TextInputType.text,
                 obscureText: true,
                 decoration: InputDecoration(
-                    hintText: "Enter your password",
-                    prefixIcon: Icon(Icons.password_rounded),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context)),
-                    filled: true,
-                    contentPadding: const EdgeInsets.all(8),
-                    border: OutlineInputBorder(
-                        borderSide: Divider.createBorderSide(context))),
+                  hintText: "Enter your password",
+                  prefixIcon: Icon(Icons.password_rounded),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                  filled: true,
+                  contentPadding: const EdgeInsets.all(8),
+                  border: OutlineInputBorder(
+                    borderSide: Divider.createBorderSide(context),
+                  ),
+                ),
               ),
               SizedBox(
-                height: 30,
+                height: screenHeight * 0.03,
               ),
               GestureDetector(
                 onTap: () async {
@@ -189,31 +207,44 @@ class _LoginScreenState extends State<SignupScreen> {
                     });
                   }
                   userSignup(
-                      username: username,
-                      email: email,
-                      password: password,
-                      context: context);
+                    username: username,
+                    email: email,
+                    password: password,
+                    context: context,
+                  );
                 },
                 child: Container(
-                  height: 50,
+                  height: screenHeight * 0.058,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Center(
-                      child: Text(
-                    "Sign up",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  )),
+                  child: _isLoading
+                      ? Center(
+                          child: SizedBox(
+                              height: screenHeight * 0.02,
+                              width: screenHeight * 0.02,
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                              ),
+                            ),
+                        )
+                      : Center(
+                          child: Text(
+                            "Sign up",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenHeight * 0.018,
+                            ),
+                          ),
+                        ),
                 ),
               ),
               SizedBox(
-                height: 50,
+                height: screenHeight * 0.05,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -230,12 +261,16 @@ class _LoginScreenState extends State<SignupScreen> {
                         ),
                       );
                     },
-                    child: const Text('Login',
-                        style:
-                            TextStyle(color: Color(0XFF3797EF), fontSize: 14)),
-                  )
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        color: Color(0XFF3797EF),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),

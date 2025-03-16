@@ -1,6 +1,7 @@
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/signup_screen.dart';
+import 'package:chat_app/widgets/bottom_navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (ctx) => ChatScreen(),
+          builder: (ctx) => BottomNavigation(),
         ),
       );
     } on FirebaseAuthException catch (e) {
@@ -63,11 +64,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      // backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(left: 20, right: 20, top: 150),
+          margin: EdgeInsets.only(
+            left: screenWidth * 0.05,
+            right: screenWidth * 0.05,
+            top: screenHeight * 0.138,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -76,12 +83,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   child: Image.asset(
                     "assets/text.png",
-                    height: 140,
-                    width: 200,
+                    height: screenHeight * 0.2,
+                    width: screenWidth * 0.5,
                   ),
                 ),
                 SizedBox(
-                  height: 50,
+                  height: screenHeight * 0.05,
                 ),
                 TextFormField(
                   controller: _emailController,
@@ -95,21 +102,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                      hintText: "Enter your email",
-                      // fillColor: Colors.black54,
-                      prefixIcon: Icon(Icons.email_outlined),
-                      // hintStyle: TextStyle(color: Colors.white),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: Divider.createBorderSide(context)),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: Divider.createBorderSide(context)),
-                      filled: true,
-                      contentPadding: const EdgeInsets.all(8),
-                      border: OutlineInputBorder(
-                          borderSide: Divider.createBorderSide(context))),
+                    hintText: "Enter your email",
+                    prefixIcon: Icon(Icons.email_outlined),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                    filled: true,
+                    contentPadding: const EdgeInsets.all(8),
+                    border: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                  ),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: screenHeight * 0.02,
                 ),
                 TextFormField(
                   controller: _passwordController,
@@ -122,19 +131,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.text,
                   obscureText: true,
                   decoration: InputDecoration(
-                      hintText: "Enter your password",
-                      prefixIcon: Icon(Icons.password_rounded),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: Divider.createBorderSide(context)),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: Divider.createBorderSide(context)),
-                      filled: true,
-                      contentPadding: const EdgeInsets.all(8),
-                      border: OutlineInputBorder(
-                          borderSide: Divider.createBorderSide(context))),
+                    hintText: "Enter your password",
+                    prefixIcon: Icon(Icons.password_rounded),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                    filled: true,
+                    contentPadding: const EdgeInsets.all(8),
+                    border: OutlineInputBorder(
+                      borderSide: Divider.createBorderSide(context),
+                    ),
+                  ),
                 ),
                 SizedBox(
-                  height: 30,
+                  height: screenHeight * 0.03,
                 ),
                 GestureDetector(
                   onTap: () async {
@@ -147,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     userLogin();
                   },
                   child: Container(
-                    height: 50,
+                    height: screenHeight * 0.058,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -157,24 +170,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: _isLoading
                         ? Center(
                             child: SizedBox(
-                              height: 25,
-                              width: 25,
-                                child: CircularProgressIndicator(
-                              color: Colors.black,
-                            )),
+                              height: screenHeight * 0.02,
+                              width: screenHeight * 0.02,
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                              ),
+                            ),
                           )
                         : Center(
                             child: Text(
-                            "Login",
-                            style: TextStyle(
+                              "Login",
+                              style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          )),
+                                fontSize: screenHeight * 0.018,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 SizedBox(
-                  height: 50,
+                  height: screenHeight * 0.05,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -191,12 +207,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      child: const Text('Sign up',
-                          style: TextStyle(
-                              color: Color(0XFF3797EF), fontSize: 14)),
-                    )
+                      child: const Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: Color(0XFF3797EF),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),
