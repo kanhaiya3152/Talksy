@@ -147,13 +147,16 @@ class MessageBubble extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(
-                              timeString,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: isMe
-                                    ? Colors.black54
-                                    : theme.colorScheme.onSecondary.withAlpha(150),
+                            Container(
+                              alignment: Alignment.bottomRight,
+                              child: Text(
+                                timeString,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: isMe
+                                      ? Colors.black54
+                                      : theme.colorScheme.onSecondary.withAlpha(150),
+                                ),
                               ),
                             ),
                           ],

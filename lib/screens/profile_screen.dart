@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:chat_app/screens/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -20,8 +23,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Uint8List? _image;
   String? _imageUrl;
   bool _isUploading = false;
+  String username = "";
+  String email = "";
+  String bio = "";
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
 
-  String userId = FirebaseAuth.instance.currentUser!.uid;
+  final userId = FirebaseAuth.instance.currentUser;
 
   // Function to pick an image
   Future<Uint8List?> pickImage(ImageSource source) async {
@@ -50,48 +58,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Upload image to Cloudinary
   Future<void> _uploadImageToCloudinary(Uint8List fileBytes) async {
-    setState(() {
-      _isUploading = true;
-    });
+  setState(() => _isUploading = true);
 
-    try {
-      // Convert Uint8List to File
-      final tempDir = await getTemporaryDirectory();
-      final file =
-          await File('${tempDir.path}/image.png').writeAsBytes(fileBytes);
+  try {
+    final tempDir = await getTemporaryDirectory();
+    final file = await File('${tempDir.path}/image.png').writeAsBytes(fileBytes);
 
-      // Call the Cloudinary upload function
-      String? imageUrl = await uploadImageToCloudinary(file);
+    String? imageUrl = await uploadImageToCloudinary(file);
 
-      if (imageUrl != null) {
-        setState(() {
-          _imageUrl = imageUrl;
-          _image = null; // Clear local image
-        });
-      } else {
-        print("Image upload failed");
-      }
-
-      if (imageUrl != null) {
-        setState(() {
-          _imageUrl = imageUrl;
-          _image = null; // Clear local image
-        });
-        // Save the URL to Firestore
-        await saveImageUrlToFirestore(imageUrl);
-      }
-    } catch (e) {
-      print("Error uploading image: $e");
-    } finally {
-      setState(() {
-        _isUploading = false;
-      });
+    if (imageUrl != null) {
+      await saveImageUrlToFirestore(imageUrl);
+      setState(() => _imageUrl = imageUrl);
+    } else {
+      debugPrint("Image upload failed");
     }
+  } catch (e) {
+    debugPrint("Error uploading image: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Failed to upload image. Try again.")),
+    );
+  } finally {
+    setState(() => _isUploading = false);
   }
+}
+
 
   // Upload file to Cloudinary
   Future<String?> uploadImageToCloudinary(File imageFile) async {
-    String cloudName = "dn30ixuij"; // Replace with your Cloudinary cloud name
+    String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? ""; // Replace with your Cloudinary cloud name
     String uploadPreset = "upload_file"; // Replace with your upload preset
 
     final cloudinaryUrl =
@@ -117,11 +111,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Save Image URL to Firestore
   Future<void> saveImageUrlToFirestore(String imageUrl) async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId!.uid)
+          .set({
         'profilePic': imageUrl,
       }, SetOptions(merge: true));
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Uploded")));
+          .showSnackBar(SnackBar(content: Text("Uploaded")));
     } on FirebaseException catch (e) {
       // print(e.hashCode);
       debugPrint("Nhi chl rha h");
@@ -132,28 +129,206 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Fetch Image URL from Firestore
   Future<void> _fetchProfileImage() async {
-  try {
-    DocumentSnapshot userDoc = 
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId!.uid)
+          .get();
 
-    if (userDoc.exists) {
-      String? fetchedImageUrl = (userDoc.data() as Map<String, dynamic>?)?['profilePic']; // Safe access
-      if (fetchedImageUrl != null) {
-        setState(() {
-          _imageUrl = fetchedImageUrl;
-        });
+      username = (userDoc.data() as Map<String, dynamic>)['username'];
+      email = (userDoc.data() as Map<String, dynamic>)['email'];
+      bio = (userDoc.data() as Map<String, dynamic>)['bio'] ?? "";
+
+      if (userDoc.exists) {
+        String? fetchedImageUrl = (userDoc.data()
+            as Map<String, dynamic>?)?['profilePic']; // Safe access
+        if (fetchedImageUrl != null && fetchedImageUrl.isNotEmpty) {
+          setState(() {
+            _imageUrl = fetchedImageUrl;
+          });
+        } else {
+          // Set default profile picture if none exists
+          await _setDefaultProfilePicture();
+        }
       }
+    } catch (e) {
+      print("Error fetching profile image: $e");
+    }
+  }
+
+  Future<void> _setDefaultProfilePicture() async {
+  try {
+    final ByteData bytes = await rootBundle.load('assets/profile.webp');
+    final Uint8List defaultImageBytes = bytes.buffer.asUint8List();
+
+    String? defaultImageUrl = await uploadImageToCloudinary(
+      await File('${(await getTemporaryDirectory()).path}/default.png')
+          .writeAsBytes(defaultImageBytes),
+    );
+
+    if (defaultImageUrl != null) {
+      await saveImageUrlToFirestore(defaultImageUrl);
+      setState(() => _imageUrl = defaultImageUrl);
     }
   } catch (e) {
-    print("Error fetching profile image: $e");
+    debugPrint('Error setting default profile picture: $e');
   }
 }
 
-@override
-void initState() {
-  super.initState();
-  _fetchProfileImage(); // Fetch image on screen load
-}
+
+  Future<void> _getUserData() async {
+    if (userId != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId!.uid)
+          .get();
+
+      setState(() {
+        email = userId!.email ?? "";
+        username = userDoc['username'] ?? "No Username";
+        bio = userDoc['bio'] ?? "";
+        _usernameController.text = username;
+        _bioController.text = bio;
+      });
+    }
+  }
+
+  Future<void> _updateUsername() async {
+    if (userId != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId!.uid)
+          .update({
+        'username': _usernameController.text,
+      });
+
+      setState(() {
+        username = _usernameController.text;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Username updated successfully')),
+      );
+    }
+  }
+
+  Future<void> _updateBio() async {
+    if (userId != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId!.uid)
+          .update({
+        'bio': _bioController.text,
+      });
+
+      setState(() {
+        bio = _bioController.text;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bio updated successfully')),
+      );
+    }
+  }
+
+  void _showUpdateUsernameDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Username'),
+          content: TextField(
+            controller: _usernameController,
+            decoration: InputDecoration(hintText: "Enter new username"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateUsername();
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showUpdateBioDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Bio'),
+          content: TextField(
+            controller: _bioController,
+            decoration: InputDecoration(hintText: "Enter new bio"),
+            maxLines: 2,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateBio();
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Are you sure !'),
+
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (ctx) => LoginScreen(),
+                          ),
+                        );
+              },
+              child: Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileImage(); // Fetch image on screen load
+    _getUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,45 +353,174 @@ void initState() {
                       children: [
                         _imageUrl != null
                             ? CircleAvatar(
-                                radius: 40,
+                                radius: 45,
                                 backgroundImage: NetworkImage(_imageUrl!),
                               )
                             : _image != null
                                 ? CircleAvatar(
-                                    radius: 40,
+                                    radius: 45,
                                     backgroundImage: MemoryImage(_image!),
                                   )
-                                : const CircleAvatar(
-                                    radius: 40,
-                                    backgroundColor: Colors.grey,
-                                    child: Icon(Icons.person),
+                                : CircleAvatar(
+                                    radius: 45,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(60),
+                                      child: Image.asset("assets/profile.webp")),
                                   ),
                         Positioned(
                           bottom: -0,
-                          left: 45,
-                          child: IconButton(
-                            onPressed: _selectImage,
-                            icon: const Icon(
-                              Icons.camera_alt_sharp,
+                          left: 50,
+                          child: Container(
+                            height: 28,
+                            width: 28,
+                            decoration: BoxDecoration(
                               color: Colors.blue,
+                              borderRadius: BorderRadius.circular(60),
+                              // border: Border.all(),
+                            ),
+                            child: IconButton(
+                              onPressed: _selectImage,
+                              icon: const Icon(
+                                Icons.camera_alt_sharp,
+                                color: Colors.white,
+                                size: 13,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
-              title: Text("Karan"),
-              subtitle: Text("Hello babe, what's going on?"),
+              title: Text(
+                username,
+                style: TextStyle(fontSize: 20),
+              ),
+              subtitle: bio.isNotEmpty ? Text(bio) : Text("Add bio"),
             ),
           ),
           // if (_isUploading) CircularProgressIndicator(),
+          SizedBox(
+            height: 10,
+          ),
           Divider(),
+          SizedBox(
+            height: 10,
+          ),
           Container(
+            height: MediaQuery.of(context).size.height / 2.35,
+            width: double.infinity,
             child: Card(
-              child: Column(
-                children: [
-                  Text("Karan Kumar ......."),
-                  Text("Hello............ "),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 20, right: 20, top: 10, bottom: 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Name",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            ),
+                            TextButton(
+                                onPressed: _showUpdateUsernameDialog,
+                                child: Text("Edit")),
+                          ],
+                        ),
+                        Text(
+                          username,
+                          style: TextStyle(fontSize: 18, color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Email",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
+                        Text(email,
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.white70)),
+                      ],
+                    ),
+                    Divider(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Bio",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            ),
+                            TextButton(
+                                onPressed: _showUpdateBioDialog,
+                                child: Text("Edit"))
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: _showUpdateBioDialog,
+                          child: Text(
+                            bio.isNotEmpty ? bio : "Add bio",
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.white70),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "About",
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 17,
+                          color: Colors.white70,
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Divider(),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    GestureDetector(
+                      onTap: _logout,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Logout",
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 17,
+                            color: Colors.white70,
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

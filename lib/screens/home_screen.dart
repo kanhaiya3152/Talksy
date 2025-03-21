@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios),
         ),
         title: Text("Chats"),
       ),

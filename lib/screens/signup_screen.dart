@@ -51,7 +51,8 @@ class _SignupScreenState extends State<SignupScreen> {
       String userId = userCredential.user!.uid;
 
       Users user =
-          Users(uid: userId, username: username, email: email, profilePic: "",);
+          Users(uid: userId, username: username, email: email,
+           profilePic: '',bio: "");
 
       await FirebaseFirestore.instance
           .collection("users")

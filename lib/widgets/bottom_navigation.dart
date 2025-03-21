@@ -31,16 +31,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
           NavigationDestination(
             selectedIcon: Icon(Icons.messenger_sharp),
             icon: Icon(Icons.messenger_outline),
-            label: 'Message',
+            label: 'Chats',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.all_inbox),
-            icon: Icon(Icons.all_inbox_outlined),
-            label: 'users',
+            selectedIcon: Icon(Icons.people_alt),
+            icon: Icon(Icons.people_alt_outlined),
+            label: 'Users',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.person),
-            icon: Icon(Icons.person_2_outlined),
+            icon: Icon(Icons.person_outline),
             label: 'Profile',
           ),
         ],

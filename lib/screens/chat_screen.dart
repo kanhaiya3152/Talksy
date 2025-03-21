@@ -20,31 +20,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat"),
+        title: Text("Chats",style: TextStyle(fontSize: 25,color: Colors.white),),
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (ctx) => ProfileScreen(),
-                ),
-              );
-            },
-            icon: Icon(Icons.person),
-          ),
-          IconButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (ctx) => LoginScreen(),
-                ),
-              );
-            },
-            icon: Icon(Icons.logout),
-          ),
-        ],
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -119,7 +96,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 horizontal: 10, vertical: 5),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5)),
-                            leading: userProfilePic != null
+                            leading: userProfilePic != null && userProfilePic.isNotEmpty
                                 ? CircleAvatar(
                                     radius: 25,
                                     backgroundImage:
@@ -127,11 +104,15 @@ class _ChatScreenState extends State<ChatScreen> {
                                   )
                                 : CircleAvatar(
                                     radius: 25,
-                                    backgroundColor: Colors.grey,
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.black,
-                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(60),
+                                      child: Image.asset("assets/profile.webp")),
+                                    // backgroundColor: Colors.grey,
+                                    // child: Icon(
+                                    //   Icons.person,
+                                    //   color: Colors.white,
+                                    //   size: 50,
+                                    // ),
                                   ),
                             title: Text(userName ?? 'No Name'),
                             subtitle: Text(
