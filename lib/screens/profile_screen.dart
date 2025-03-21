@@ -75,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   } catch (e) {
     debugPrint("Error uploading image: $e");
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Failed to upload image. Try again.")),
+      const SnackBar(content: Text("Failed to upload image. Try again.")),
     );
   } finally {
     setState(() => _isUploading = false);
@@ -118,12 +118,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'profilePic': imageUrl,
       }, SetOptions(merge: true));
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Uploaded")));
+          .showSnackBar(const SnackBar(content: Text("Uploaded")));
     } on FirebaseException catch (e) {
       // print(e.hashCode);
       debugPrint("Nhi chl rha h");
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("nhi chal rha ??")));
+          .showSnackBar(const SnackBar(content: Text("nhi chal rha ??")));
     }
   }
 
@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _setDefaultProfilePicture() async {
   try {
-    final ByteData bytes = await rootBundle.load('assets/profile.webp');
+    final ByteData bytes = await rootBundle.load('assets/profile.jpg'); 
     final Uint8List defaultImageBytes = bytes.buffer.asUint8List();
 
     String? defaultImageUrl = await uploadImageToCloudinary(
@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Username updated successfully')),
+        const SnackBar(content: Text('Username updated successfully')),
       );
     }
   }
@@ -226,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bio updated successfully')),
+        const SnackBar(content: Text('Bio updated successfully')),
       );
     }
   }
@@ -236,24 +236,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Update Username'),
+          title: const Text('Update Username'),
           content: TextField(
             controller: _usernameController,
-            decoration: InputDecoration(hintText: "Enter new username"),
+            decoration: const InputDecoration(hintText: "Enter new username"),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 _updateUsername();
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -266,10 +266,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Update Bio'),
+          title: const Text('Update Bio'),
           content: TextField(
             controller: _bioController,
-            decoration: InputDecoration(hintText: "Enter new bio"),
+            decoration: const InputDecoration(hintText: "Enter new bio"),
             maxLines: 2,
           ),
           actions: [
@@ -277,14 +277,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 _updateBio();
                 Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -297,25 +297,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Are you sure !'),
+          title: const Text('Do you want !'),
 
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('No'),
             ),
             TextButton(
               onPressed: () {
                 FirebaseAuth.instance.signOut();
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (ctx) => LoginScreen(),
+                            builder: (ctx) => const LoginScreen(),
                           ),
                         );
               },
-              child: Text('Ok'),
+              child: const Text('Yes'),
             ),
           ],
         );
@@ -335,37 +335,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text("Profile"),
+        title: const Text("Profile"),
       ),
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(top: 10),
+            margin: const EdgeInsets.only(top: 10),
             child: ListTile(
               leading: _isUploading
-                  ? SizedBox(
+                  ? const SizedBox(
                       height: 10,
                       width: 10,
                       child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
                         color: Colors.white,
                       ))
                   : Stack(
                       children: [
                         _imageUrl != null
                             ? CircleAvatar(
-                                radius: 45,
+                                radius: 40,
                                 backgroundImage: NetworkImage(_imageUrl!),
                               )
                             : _image != null
                                 ? CircleAvatar(
-                                    radius: 45,
+                                    radius: 40,
                                     backgroundImage: MemoryImage(_image!),
                                   )
                                 : CircleAvatar(
-                                    radius: 45,
+                                    radius: 40,
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(60),
-                                      child: Image.asset("assets/profile.webp")),
+                                      child: Image.asset("assets/profile.jpg")),
                                   ),
                         Positioned(
                           bottom: -0,
@@ -392,17 +393,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
               title: Text(
                 username,
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               ),
-              subtitle: bio.isNotEmpty ? Text(bio) : Text("Add bio"),
+              subtitle: bio.isNotEmpty ? Text(bio) : const Text("Add bio"),
             ),
           ),
           // if (_isUploading) CircularProgressIndicator(),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Divider(),
-          SizedBox(
+          const Divider(),
+          const SizedBox(
             height: 10,
           ),
           Container(
@@ -421,50 +422,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               "Name",
                               style:
                                   TextStyle(fontSize: 20, color: Colors.white),
                             ),
                             TextButton(
                                 onPressed: _showUpdateUsernameDialog,
-                                child: Text("Edit")),
+                                child: const Text("Edit")),
                           ],
                         ),
                         Text(
                           username,
-                          style: TextStyle(fontSize: 18, color: Colors.white70),
+                          style: const TextStyle(fontSize: 18, color: Colors.white70),
                         ),
                       ],
                     ),
-                    Divider(),
+                    const Divider(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "Email",
                           style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                         Text(email,
                             style:
-                                TextStyle(fontSize: 18, color: Colors.white70)),
+                                const TextStyle(fontSize: 18, color: Colors.white70)),
                       ],
                     ),
-                    Divider(),
+                    const Divider(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               "Bio",
                               style:
                                   TextStyle(fontSize: 20, color: Colors.white),
                             ),
                             TextButton(
                                 onPressed: _showUpdateBioDialog,
-                                child: Text("Edit"))
+                                child: const Text("Edit"))
                           ],
                         ),
                         GestureDetector(
@@ -472,16 +473,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Text(
                             bio.isNotEmpty ? bio : "Add bio",
                             style:
-                                TextStyle(fontSize: 18, color: Colors.white70),
+                                const TextStyle(fontSize: 18, color: Colors.white70),
                           ),
                         ),
                       ],
                     ),
-                    Divider(),
-                    SizedBox(
+                    const Divider(),
+                    const SizedBox(
                       height: 5,
                     ),
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -495,16 +496,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
-                    Divider(),
-                    SizedBox(
+                    const Divider(),
+                    const SizedBox(
                       height: 5,
                     ),
                     GestureDetector(
                       onTap: _logout,
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(

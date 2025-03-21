@@ -37,9 +37,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 : CircleAvatar(
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(60),
-                        child: Image.asset("assets/profile.webp")),
+                        child: Image.asset("assets/profile.jpg")),
                   ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Text(widget.receiverName),
           ],
         ),

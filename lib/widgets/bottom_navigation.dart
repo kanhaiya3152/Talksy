@@ -46,9 +46,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
         ],
       ),
       body: <Widget>[
-        ChatScreen(),
-        AllUsersScreen(),
-        ProfileScreen(),
+        const ChatScreen(),
+        const AllUsersScreen(),
+        const ProfileScreen(),
       ][currentPageIndex],
     );
   }

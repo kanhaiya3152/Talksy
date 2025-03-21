@@ -20,7 +20,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chats",style: TextStyle(fontSize: 25,color: Colors.white),),
+        title: const Text("Chats",style: TextStyle(fontSize: 25,color: Colors.white),),
         automaticallyImplyLeading: false,
       ),
       body: StreamBuilder(
@@ -31,7 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -39,18 +39,18 @@ class _ChatScreenState extends State<ChatScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No conversations found"));
+            return const Center(child: Text("No conversations found"));
           }
 
           return Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               children: [
                 Expanded(
                   child: ListView.separated(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
                     itemCount: snapshot.data!.docs.length,
-                    separatorBuilder: (context, index) => Divider(
+                    separatorBuilder: (context, index) => const Divider(
                       height: 10,
                       color: Colors.black,
                     ),
@@ -78,12 +78,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         builder: (context, userSnapshot) {
                           if (userSnapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return SizedBox(); // Avoid showing empty data
+                            return const SizedBox(); // Avoid showing empty data
                           }
 
                           if (!userSnapshot.hasData ||
                               !userSnapshot.data!.exists) {
-                            return SizedBox();
+                            return const SizedBox();
                           }
 
                           var userDoc = userSnapshot.data!;
@@ -92,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                           return ListTile(
                             tileColor: const Color.fromARGB(255, 31, 30, 30),
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 5),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5)),
@@ -106,13 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     radius: 25,
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(60),
-                                      child: Image.asset("assets/profile.webp")),
-                                    // backgroundColor: Colors.grey,
-                                    // child: Icon(
-                                    //   Icons.person,
-                                    //   color: Colors.white,
-                                    //   size: 50,
-                                    // ),
+                                      child: Image.asset("assets/profile.jpg")),
                                   ),
                             title: Text(userName ?? 'No Name'),
                             subtitle: Text(
@@ -132,15 +126,15 @@ class _ChatScreenState extends State<ChatScreen> {
                                       : getTime(lastMessage["createdAt"]),
                                   style: const TextStyle(color: Colors.grey),
                                 ),
-                                SizedBox(height: 10),
+                                const SizedBox(height: 10),
                                 unreadCounter == 0
-                                    ? SizedBox(height: 10)
+                                    ? const SizedBox(height: 10)
                                     : CircleAvatar(
                                         radius: 10,
                                         backgroundColor: Colors.black,
                                         child: Text(
                                           "$unreadCounter",
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 10),
                                         ),
@@ -148,7 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ],
                             ),
                             onTap: () {
-                              // 🔥 Reset unreadCounter when opening chat
+                              //  Reset unreadCounter when opening chat
                               FirebaseFirestore.instance
                                   .collection("chatrooms")
                                   .doc(chatRoomDoc.id)

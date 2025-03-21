@@ -17,13 +17,13 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Users"),
+        title: const Text("Users"),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection("users").snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -31,18 +31,18 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No users found"));
+            return const Center(child: Text("No users found"));
           }
 
           return Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               children: [
                 Expanded(
                   child: ListView.separated(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
                     itemCount: snapshot.data!.docs.length,
-                    separatorBuilder: (context, index) => Divider(
+                    separatorBuilder: (context, index) => const Divider(
                       height: 10,
                       color: Colors.black,
                     ),
@@ -54,13 +54,13 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
 
                       // Skip the current user
                       if (userUid == userId.uid) {
-                        return SizedBox();
+                        return const SizedBox();
                       }
 
                       return ListTile(
                         tileColor: const Color.fromARGB(255, 31, 30, 30),
                         contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
                         leading: userProfilePic != null &&
@@ -73,7 +73,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
                                 radius: 25,
                                 child: ClipRRect(
                                     borderRadius: BorderRadius.circular(60),
-                                    child: Image.asset("assets/profile.webp")),
+                                    child: Image.asset("assets/profile.jpg")),
                               ),
                         title: Text(userName ?? 'No Name'),
                         onTap: () {

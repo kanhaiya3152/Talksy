@@ -47,15 +47,15 @@ class _ChatMessagesState extends State<ChatMessages> {
           .snapshots(),
       builder: (ctx, chatSnapshots) {
         if (chatSnapshots.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (chatSnapshots.hasError) {
-          return Center(child: Text("Something went wrong. Please try again."));
+          return const Center(child: Text("Something went wrong. Please try again."));
         }
 
         if (!chatSnapshots.hasData || chatSnapshots.data!.docs.isEmpty) {
-          return Center(child: Text("No messages found."));
+          return const Center(child: Text("No messages found."));
         }
 
         final loadedMessages = chatSnapshots.data!.docs;
@@ -80,7 +80,7 @@ class _ChatMessagesState extends State<ChatMessages> {
               child: Center(
                 child: Text(
                   displayDate,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
                 ),
               ),
             ),
@@ -96,6 +96,7 @@ class _ChatMessagesState extends State<ChatMessages> {
             if (previousMessageUserId == currentMessageUserId) {
               messageWidgets.add(MessageBubble.next(
                 message: chatMessage['text'],
+                imageUrl: chatMessage['imageUrl'], // Pass image URL if available
                 isMe: authenticatedUser.uid == currentMessageUserId,
                 timestamp: Timestamp.fromDate(timestamp),
               ));
@@ -103,6 +104,7 @@ class _ChatMessagesState extends State<ChatMessages> {
               messageWidgets.add(MessageBubble.first(
                 username: chatMessage['username'],
                 message: chatMessage['text'],
+                imageUrl: chatMessage['imageUrl'], // Pass image URL if available
                 userImage: chatMessage['userimage'],
                 isMe: authenticatedUser.uid == currentMessageUserId,
                 timestamp: Timestamp.fromDate(timestamp),
@@ -112,7 +114,7 @@ class _ChatMessagesState extends State<ChatMessages> {
         });
 
         return ListView(
-          padding: EdgeInsets.only(bottom: 40, left: 13, right: 13),
+          padding: const EdgeInsets.only(bottom: 40, left: 13, right: 13),
           reverse: true, // Messages are already in correct order
           children: messageWidgets.reversed.toList(),
         );

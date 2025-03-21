@@ -64,13 +64,13 @@ class _SignupScreenState extends State<SignupScreen> {
       });
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           backgroundColor: Colors.green,
           content: Text('Registered Successfully'),
         ));
 
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (ctx) => BottomNavigation()),
+          MaterialPageRoute(builder: (ctx) => const BottomNavigation()),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -124,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 obscureText: false,
                 decoration: InputDecoration(
                   hintText: "Enter your name",
-                  prefixIcon: Icon(Icons.person),
+                  prefixIcon: const Icon(Icons.person),
                   focusedBorder: OutlineInputBorder(
                     borderSide: Divider.createBorderSide(context),
                   ),
@@ -152,7 +152,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: "Enter your email",
-                  prefixIcon: Icon(Icons.email_outlined),
+                  prefixIcon: const Icon(Icons.email_outlined),
                   focusedBorder: OutlineInputBorder(
                     borderSide: Divider.createBorderSide(context),
                   ),
@@ -181,7 +181,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Enter your password",
-                  prefixIcon: Icon(Icons.password_rounded),
+                  prefixIcon: const Icon(Icons.password_rounded),
                   focusedBorder: OutlineInputBorder(
                     borderSide: Divider.createBorderSide(context),
                   ),
@@ -227,7 +227,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: SizedBox(
                               height: screenHeight * 0.02,
                               width: screenHeight * 0.02,
-                              child: CircularProgressIndicator(
+                              child: const CircularProgressIndicator(
                                 color: Colors.black,
                               ),
                             ),
@@ -258,7 +258,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (ctx) => LoginScreen(),
+                          builder: (ctx) => const LoginScreen(),
                         ),
                       );
                     },
