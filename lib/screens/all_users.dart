@@ -59,22 +59,21 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
 
                       return ListTile(
                         tileColor: const Color.fromARGB(255, 31, 30, 30),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
-                        leading: userProfilePic != null
+                        leading: userProfilePic != null &&
+                                userProfilePic.isNotEmpty
                             ? CircleAvatar(
                                 radius: 25,
                                 backgroundImage: NetworkImage(userProfilePic),
                               )
                             : CircleAvatar(
                                 radius: 25,
-                                backgroundColor: Colors.grey,
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.black,
-                                ),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(60),
+                                    child: Image.asset("assets/profile.webp")),
                               ),
                         title: Text(userName ?? 'No Name'),
                         onTap: () {

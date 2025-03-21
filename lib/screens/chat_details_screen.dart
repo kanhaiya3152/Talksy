@@ -29,12 +29,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            widget.receiverProfilePic != null
+            widget.receiverProfilePic != null &&
+                    widget.receiverProfilePic!.isNotEmpty
                 ? CircleAvatar(
                     backgroundImage: NetworkImage(widget.receiverProfilePic!),
                   )
                 : CircleAvatar(
-                    child: Icon(Icons.person),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(60),
+                        child: Image.asset("assets/profile.webp")),
                   ),
             SizedBox(width: 10),
             Text(widget.receiverName),
