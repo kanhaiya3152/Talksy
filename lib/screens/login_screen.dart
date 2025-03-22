@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/chat_screen.dart';
+import 'package:chat_app/screens/forgot_password.dart';
 import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/signup_screen.dart';
 import 'package:chat_app/widgets/bottom_navigation.dart';
@@ -146,8 +147,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+                Container(
+                  alignment: Alignment.topRight,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => const ForgotPasswordScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Forgot Password",
+                        style: TextStyle(
+                            color: Color(0XFF3797EF),
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15),
+                      )),
+                ),
                 SizedBox(
-                  height: screenHeight * 0.03,
+                  height: screenHeight * 0.02,
                 ),
                 GestureDetector(
                   onTap: () async {
