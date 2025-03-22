@@ -47,6 +47,12 @@ dependencies:
   path_provider: ^2.1.5
   permission_handler: ^11.4.0
   intl: ^0.20.2
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.webp"
 
 dev_dependencies:
   flutter_test:
