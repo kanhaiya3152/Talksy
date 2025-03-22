@@ -27,19 +27,19 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark()
           .copyWith(scaffoldBackgroundColor: Color.fromRGBO(0, 0, 0, 1)),
-      // home: StreamBuilder(
-      //     stream: FirebaseAuth.instance.authStateChanges(),
-      //     builder: (ctx, snapshot) {
-      //       if (snapshot.connectionState == ConnectionState.waiting) {
-      //         return SplashScreen();
-      //       }
-      //       if (snapshot.hasData) {
-      //         return BottomNavigation();
-      //       }
+      home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return SplashScreen();
+            }
+            if (snapshot.hasData) {
+              return BottomNavigation();
+            }
 
-      //       return LoginScreen();
-      //     }),
-      home: SplashScreen(),
+            return LoginScreen();
+          }),
+      // home: SplashScreen(),
     );
   }
 }
