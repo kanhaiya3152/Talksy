@@ -45,11 +45,7 @@ Talksy is a modern and intuitive **real-time chat application** designed for smo
    ```sh
    flutter run
    ```
-
-## 📸 Screenshots
-
-(Add screenshots of the app interface here for better visualization)
-
+   
 ## 🤝 Contribution
 
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
