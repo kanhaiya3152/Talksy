@@ -12,7 +12,7 @@ Talksy is a modern and intuitive **real-time chat application** designed for smo
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Flutter (or specify if different)
+- **Frontend**: Flutter 
 - **Backend**: Firebase Firestore
 - **Media Storage**: Cloudinary
 - **Authentication**: Firebase Authentication
