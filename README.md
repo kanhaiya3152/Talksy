@@ -1,6 +1,6 @@
 # Talksy
 
-Talksy is a modern **chat application** that enables seamless real-time communication. It features **user authentication**, **media storage**, and a robust backend powered by **Cloudinary** and **Firebase**.
+Talksy is a modern and intuitive **real-time chat application** designed for smooth and secure communication. It enables users to send text **messages** and share **media files** effortlessly. Built with **Firebase** for authentication and database management, and **Cloudinary** for media storage, Talksy ensures a fast and reliable messaging experience. 
 
 ## 🚀 Features
 
